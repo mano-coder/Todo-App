@@ -72,6 +72,10 @@ header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  display: flex;
+  align-items: center;
+  padding: 0 0.6em;
+  height: 3.5rem;
 }
 
 header h1 {
@@ -91,12 +95,11 @@ form {
   margin: 3em 0 1em 0;
 }
 input {
-  width: 100%;
-  height: 2rem;
+  flex: 1; /* This makes the input take up the remaining space */
   background-color: transparent;
-  font-family: inherit;
   border: none;
-  font-size: 1rem;
+  font-family: inherit;
+  font-size: 1rem; /* Adjusting size to match body copy */
   color: var(--text-main);
   padding-left: 0.5rem;
 }
@@ -134,7 +137,10 @@ input[type="text"] {
 .box:last-child {
   border: none;
 }
-
+.box.dragging {
+  opacity: 0.5;
+  cursor: move;
+}
 .boxes-section .box:hover .hidden-btn {
   opacity: 1;
 }
