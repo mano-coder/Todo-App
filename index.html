@@ -1,36 +1,106 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- displays site properly based on user's device -->
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="./images/favicon-32x32.png"
+    />
+    <title>Frontend Mentor | Todo app</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main>
+      <header>
+        <h1>TODO</h1>
+        <button type="button" id="theme-btn">
+          <img src="./images/icon-moon.svg" alt="icon-moon" id="icon-moon" />
+          <img
+            src="./images/icon-sun.svg"
+            alt="icon-sun"
+            class="hidden"
+            id="icon-sun"
+          />
+        </button>
+      </header>
+      <form class="box">
+        <span class="checkbox"><input type="checkbox" /></span>
+        <input
+          type="text"
+          name="task"
+          value=""
+          aria-label="Create a new task"
+          placeholder="Create a new todo..."
+        />
+      </form>
 
-  <link rel="icon" type="image/png" sizes="32x32" href="./images/favicon-32x32.png">
-  
-  <title>Frontend Mentor | Todo app</title>
+      <section class="boxes-section">
+        <ul id="task-list">
+          <li class="box">
+            <span class="checkbox checked"><input type="checkbox" /></span>
+            <span>Amet adipisicing perferendis.</span>
+            <button class="hidden-btn">
+              <img src="./images/icon-cross.svg" />
+            </button>
+          </li>
+          <li class="box">
+            <span class="checkbox"><input type="checkbox" /></span>
+            <span>Amet placeat sint?</span>
+            <button class="hidden-btn">
+              <img src="./images/icon-cross.svg" />
+            </button>
+          </li>
+          <li class="box">
+            <span class="checkbox"><input type="checkbox" /></span>
+            <span>Ipsum ex reprehenderit</span>
+            <button class="hidden-btn">
+              <img src="./images/icon-cross.svg" />
+            </button>
+          </li>
+          <li class="box">
+            <span class="checkbox"><input type="checkbox" /></span>
+            <span>Dolor recusandae nesciunt.</span>
+            <button class="hidden-btn">
+              <img src="./images/icon-cross.svg" />
+            </button>
+          </li>
+          <li class="box">
+            <span class="checkbox"><input type="checkbox" /></span>
+            <span>Consectetur quas eos</span>
+            <button class="hidden-btn">
+              <img src="./images/icon-cross.svg" />
+            </button>
+          </li>
+        </ul>
+        <footer class="box">
+          <span id="item-left">5 items left</span>
+          <div class="filter-options">
+            <button type="button">All</button>
+            <button type="button" class="selected">Active</button>
+            <button type="button">Completed</button>
+          </div>
+          <button type="button" id="clear-completed">Clear Completed</button>
+        </footer>
+      </section>
 
-  <!-- Feel free to remove these styles or customise in your own stylesheet 👍 -->
-  <style>
-    .attribution { font-size: 11px; text-align: center; }
-    .attribution a { color: hsl(228, 45%, 44%); }
-  </style>
-</head>
-<body>
+      <p class="note">Drag and drop to reorder list</p>
+    </main>
 
-  Todo
-
-  <!-- Add dynamic number --> items left
-
-  All
-  Active 
-  Completed
-
-  Clear Completed
-
-  Drag and drop to reorder list
-
-  <div class="attribution">
-    Challenge by <a href="https://www.frontendmentor.io?ref=challenge" target="_blank">Frontend Mentor</a>. 
-    Coded by <a href="#">Your Name Here</a>.
-  </div>
-</body>
+    <div class="attribution">
+      Challenge by
+      <a href="https://www.frontendmentor.io?ref=challenge" target="_blank"
+        >Frontend Mentor</a
+      >. Coded by <a href="#">Your Name Here</a>.
+    </div>
+  </body>
+  <script src="./script.js"></script>
 </html>
