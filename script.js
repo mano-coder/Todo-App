@@ -6,6 +6,13 @@ const input = document.querySelector('input[type="text"]');
 const form = document.querySelector("form");
 const clearCompleted = document.getElementById("clear-completed");
 
+const savedTheme = localStorage.getItem("theme");
+if (savedTheme === "dark") {
+  document.body.setAttribute("data-theme", "dark");
+  document.getElementById("icon-sun").classList.remove("hidden");
+  document.getElementById("icon-moon").classList.add("hidden");
+}
+
 const updateItemsLeft = () => {
   const activeTasks = taskList.querySelectorAll(
     ".checkbox:not(.checked)",
@@ -20,7 +27,7 @@ const saveToLocalStorage = () => {
 
   tasksEl.forEach((task) => {
     taskArr.push({
-      text: task.querySelector('span:not(.checkbox)').innerText,
+      text: task.querySelector("span:not(.checkbox)").innerText,
       completed: task.querySelector(".checkbox").classList.contains("checked"),
     });
   });
@@ -33,32 +40,45 @@ const loadFromLocalStorage = () => {
   if (savedTodos) {
     taskList.innerHTML = "";
     savedTodos.forEach((todo) => {
-      taskList.innerHTML += `
-          <li class="box" draggable="true">
+      taskList.insertAdjacentHTML(
+        "beforeend",
+        `<li class="box" draggable="true">
             <span class="checkbox ${todo.completed ? "checked" : ""}"><input type="checkbox" /></span>
             <span>${todo.text}</span>
             <button class="hidden-btn">
               <img src="./images/icon-cross.svg" />
             </button>
-          </li>
-  `;
+          </li>`,
+      );
     });
     updateItemsLeft();
   }
 };
 
-themeSwitch.addEventListener("click", () => {
+const updateThemeIcons = () => {
   const iconSun = document.getElementById("icon-sun");
   const iconMoon = document.getElementById("icon-moon");
-  if (document.body.getAttribute("data-theme") === "dark") {
-    document.body.removeAttribute("data-theme");
-    iconSun.classList.add("hidden");
-    iconMoon.classList.remove("hidden");
-  } else {
-    document.body.setAttribute("data-theme", "dark");
+  const isDark = document.body.getAttribute("data-theme") === "dark";
+
+  if (isDark) {
     iconSun.classList.remove("hidden");
     iconMoon.classList.add("hidden");
+  } else {
+    iconSun.classList.add("hidden");
+    iconMoon.classList.remove("hidden");
   }
+};
+
+themeSwitch.addEventListener("click", () => {
+  const isDark = document.body.getAttribute("data-theme") === "dark";
+  if (isDark) {
+    document.body.removeAttribute("data-theme");
+    localStorage.setItem("theme", "light");
+  } else {
+    document.body.setAttribute("data-theme", "dark");
+    localStorage.setItem("theme", "dark");
+  }
+  updateThemeIcons();
 });
 
 form.addEventListener("click", (e) => {
@@ -75,15 +95,19 @@ form.addEventListener("submit", (e) => {
   let isInputChecked = document
     .querySelector("form .checkbox")
     .classList.contains("checked");
-  taskList.innerHTML += `
-          <li class="box" draggable="true">
-            <span class="checkbox ${isInputChecked ? "checked" : ""}"><input type="checkbox" /></span>
-            <span>${input.value}</span>
-            <button class="hidden-btn">
-              <img src="./images/icon-cross.svg" />
-            </button>
-          </li>
-  `;
+  taskList.insertAdjacentHTML(
+    "beforeend",
+    `
+    <li class="box" draggable="true">
+    <span class="checkbox ${isInputChecked ? "checked" : ""}"><input type="checkbox" /></span>
+    <span>${input.value}</span>
+    <button class="hidden-btn">
+    <img src="./images/icon-cross.svg" />
+    </button>
+    </li>
+    `,
+  );
+
   input.value = "";
   document.querySelector("form .checkbox").classList?.remove("checked");
   updateItemsLeft();
@@ -129,7 +153,6 @@ taskList.addEventListener("dragover", (e) => {
   });
 
   taskList.insertBefore(draggingItem, nextSibling);
-  saveToLocalStorage();
 });
 
 clearCompleted.addEventListener("click", () => {
