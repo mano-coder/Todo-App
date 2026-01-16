@@ -64,6 +64,7 @@ body {
 }
 
 main {
+  flex: 1;
   padding-top: 3rem;
   width: 90%;
 }
@@ -72,10 +73,7 @@ header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  display: flex;
-  align-items: center;
-  padding: 0 0.6em;
-  height: 3.5rem;
+  margin-bottom: 1rem;
 }
 
 header h1 {
@@ -93,6 +91,10 @@ form {
   border-radius: 8px;
   background-color: var(--bg-card);
   margin: 3em 0 1em 0;
+  display: flex; /* Add this */
+  align-items: center; /* Add this */
+  padding: 0 0.6em;
+  height: 3.5rem;
 }
 input {
   flex: 1; /* This makes the input take up the remaining space */
@@ -114,8 +116,18 @@ input[type="text"] {
   caret-color: var(--bright-blue);
 }
 
+#task-list:empty::after {
+  content: "No tasks yet! Add one above.";
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 4rem;
+  color: var(--text-filter-idle);
+  font-size: 0.9rem;
+  font-style: italic;
+}
+
 .boxes-section {
-  background-color: red;
   border-radius: 8px;
   background-color: var(--bg-card);
   margin-bottom: 5rem;
@@ -123,7 +135,6 @@ input[type="text"] {
 }
 
 .box {
-  /* background-color: var(--bg-card); */
   height: 3rem;
   width: 100%;
   border: none;
@@ -132,15 +143,32 @@ input[type="text"] {
   align-items: center;
   padding: 0 0.6em;
   font-size: 14px;
+  transition: all 0.4s ease;
+  max-height: 48px;
+  overflow: hidden;
+  opacity: 1;
 }
 
 .box:last-child {
   border: none;
 }
+
 .box.dragging {
   opacity: 0.5;
   cursor: move;
 }
+
+.box.fall-out {
+  opacity: 0;
+  max-height: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+  margin-top: 0;
+  margin-bottom: 0;
+  border: none;
+  transform: scale(0.9); /* Adds a slight shrinking effect */
+}
+
 .boxes-section .box:hover .hidden-btn {
   opacity: 1;
 }
@@ -218,6 +246,11 @@ footer button:hover {
   color: var(--text-main);
 }
 
+footer button:hover,
+.filter-options button:hover {
+  color: var(--text-main);
+}
+
 /* Mobile Filter Box */
 .filter-options {
   position: absolute;
@@ -250,12 +283,16 @@ footer button:hover {
 .attribution {
   font-size: 11px;
   text-align: center;
-  position: absolute;
-  bottom: 1rem;
+  padding: 2rem 0;
+  padding-top: 4rem;
+  width: 100%;
+  margin-top: auto;
 }
 .attribution a {
   color: hsl(228, 45%, 44%);
 }
+
+/* Toast Notification Style */
 
 @media (min-width: 600px) {
   :root {

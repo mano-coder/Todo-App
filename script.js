@@ -89,27 +89,37 @@ form.addEventListener("click", (e) => {
 
 form.addEventListener("submit", (e) => {
   e.preventDefault();
-
   if (input.value.length === 0) return;
 
-  let isInputChecked = document
+  const currentFilter = document.querySelector(
+    ".filter-options .selected",
+  ).innerText;
+  const isInputChecked = document
     .querySelector("form .checkbox")
     .classList.contains("checked");
-  taskList.insertAdjacentHTML(
-    "beforeend",
-    `
+
+  // Create the task HTML
+  const newTaskHTML = `
     <li class="box" draggable="true">
-    <span class="checkbox ${isInputChecked ? "checked" : ""}"><input type="checkbox" /></span>
-    <span>${input.value}</span>
-    <button class="hidden-btn">
-    <img src="./images/icon-cross.svg" />
-    </button>
+      <span class="checkbox ${isInputChecked ? "checked" : ""}"><input type="checkbox" /></span>
+      <span>${input.value}</span>
+      <button class="hidden-btn"><img src="./images/icon-cross.svg" /></button>
     </li>
-    `,
-  );
+  `;
+
+  // Use insertAdjacentHTML instead of innerHTML += to keep events safe
+  taskList.insertAdjacentHTML("beforeend", newTaskHTML);
+
+  // Sync with current filter
+  const newlyAddedTask = taskList.lastElementChild;
+  if (currentFilter === "Active" && isInputChecked) {
+    newlyAddedTask.style.display = "none";
+  } else if (currentFilter === "Completed" && !isInputChecked) {
+    newlyAddedTask.style.display = "none";
+  }
 
   input.value = "";
-  document.querySelector("form .checkbox").classList?.remove("checked");
+  document.querySelector("form .checkbox").classList.remove("checked");
   updateItemsLeft();
   saveToLocalStorage();
 });
@@ -117,13 +127,29 @@ form.addEventListener("submit", (e) => {
 taskList.addEventListener("click", (e) => {
   const button = e.target.closest("button");
   const checkBox = e.target.closest(".checkbox");
-  if (button) {
-    e.target.closest("li").remove();
-    updateItemsLeft();
+  const li = e.target.closest("li");
+
+  if (button && li) {
+    // 1. Add the animation class
+    li.classList.add("fall-out");
+
+    // 2. Wait for the CSS transition (0.4s) to finish before removing
+    li.addEventListener(
+      "transitionend",
+      () => {
+        li.remove();
+        updateItemsLeft();
+        saveToLocalStorage();
+      },
+      { once: true },
+    ); // Ensure this only runs once
   }
-  if (checkBox) checkBox.classList.toggle("checked");
-  updateItemsLeft();
-  saveToLocalStorage();
+
+  if (checkBox) {
+    checkBox.classList.toggle("checked");
+    updateItemsLeft();
+    saveToLocalStorage();
+  }
 });
 
 taskList.addEventListener("dragstart", (e) => {
@@ -131,7 +157,6 @@ taskList.addEventListener("dragstart", (e) => {
   if (target) {
     target.classList.add("dragging");
   }
-  saveToLocalStorage();
 });
 
 taskList.addEventListener("dragend", (e) => {
@@ -156,11 +181,18 @@ taskList.addEventListener("dragover", (e) => {
 });
 
 clearCompleted.addEventListener("click", () => {
-  document
-    .querySelectorAll(".checkbox.checked")
-    .forEach((box) => box.closest("li").remove());
-  updateItemsLeft();
-  saveToLocalStorage();
+  const completedTasks = document.querySelectorAll(".checkbox.checked");
+  
+  completedTasks.forEach((box) => {
+    const li = box.closest("li");
+    li.classList.add("fall-out");
+    
+    li.addEventListener("transitionend", () => {
+      li.remove();
+      updateItemsLeft();
+      saveToLocalStorage();
+    }, { once: true });
+  });
 });
 
 const filterOptionsBtns = document.querySelectorAll(".filter-options button");
