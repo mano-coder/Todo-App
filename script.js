@@ -4,13 +4,48 @@ const taskList = document.getElementById("task-list");
 const itemLeft = document.getElementById("item-left");
 const input = document.querySelector('input[type="text"]');
 const form = document.querySelector("form");
-const clearCompleted = document.getElementById("clear-completed")
+const clearCompleted = document.getElementById("clear-completed");
 
 const updateItemsLeft = () => {
-  const activeTasks = taskList.querySelectorAll(".checkbox:not(.checked)").length;
-  itemLeft.innerText = `${activeTasks} items left`;;
-}
+  const activeTasks = taskList.querySelectorAll(
+    ".checkbox:not(.checked)",
+  ).length;
+  itemLeft.innerText = `${activeTasks} items left`;
+};
 updateItemsLeft();
+
+const saveToLocalStorage = () => {
+  const taskArr = [];
+  const tasksEl = document.querySelectorAll("li.box");
+
+  tasksEl.forEach((task) => {
+    taskArr.push({
+      text: task.querySelector('span:not(.checkbox)').innerText,
+      completed: task.querySelector(".checkbox").classList.contains("checked"),
+    });
+  });
+
+  localStorage.setItem("todos", JSON.stringify(taskArr));
+};
+
+const loadFromLocalStorage = () => {
+  const savedTodos = JSON.parse(localStorage.getItem("todos"));
+  if (savedTodos) {
+    taskList.innerHTML = "";
+    savedTodos.forEach((todo) => {
+      taskList.innerHTML += `
+          <li class="box" draggable="true">
+            <span class="checkbox ${todo.completed ? "checked" : ""}"><input type="checkbox" /></span>
+            <span>${todo.text}</span>
+            <button class="hidden-btn">
+              <img src="./images/icon-cross.svg" />
+            </button>
+          </li>
+  `;
+    });
+    updateItemsLeft();
+  }
+};
 
 themeSwitch.addEventListener("click", () => {
   const iconSun = document.getElementById("icon-sun");
@@ -27,9 +62,9 @@ themeSwitch.addEventListener("click", () => {
 });
 
 form.addEventListener("click", (e) => {
-  console.log("input checkbox clicked!");
   const checkBox = e.target.closest(".checkbox");
   if (checkBox) checkBox.classList.toggle("checked");
+  saveToLocalStorage();
 });
 
 form.addEventListener("submit", (e) => {
@@ -37,7 +72,9 @@ form.addEventListener("submit", (e) => {
 
   if (input.value.length === 0) return;
 
-  let isInputChecked = document.querySelector("form .checkbox").classList.contains("checked");
+  let isInputChecked = document
+    .querySelector("form .checkbox")
+    .classList.contains("checked");
   taskList.innerHTML += `
           <li class="box" draggable="true">
             <span class="checkbox ${isInputChecked ? "checked" : ""}"><input type="checkbox" /></span>
@@ -50,6 +87,7 @@ form.addEventListener("submit", (e) => {
   input.value = "";
   document.querySelector("form .checkbox").classList?.remove("checked");
   updateItemsLeft();
+  saveToLocalStorage();
 });
 
 taskList.addEventListener("click", (e) => {
@@ -60,64 +98,76 @@ taskList.addEventListener("click", (e) => {
     updateItemsLeft();
   }
   if (checkBox) checkBox.classList.toggle("checked");
+  updateItemsLeft();
+  saveToLocalStorage();
 });
 
-taskList.addEventListener('dragstart', (e) => {
-  const target = e.target.closest('li');
+taskList.addEventListener("dragstart", (e) => {
+  const target = e.target.closest("li");
   if (target) {
-    target.classList.add('dragging');
+    target.classList.add("dragging");
   }
+  saveToLocalStorage();
 });
 
-taskList.addEventListener('dragend', (e) => {
-  const target = e.target.closest('li');
+taskList.addEventListener("dragend", (e) => {
+  const target = e.target.closest("li");
   if (target) {
-    target.classList.remove('dragging');
+    target.classList.remove("dragging");
   }
+  saveToLocalStorage();
 });
 
-taskList.addEventListener('dragover', (e) => {
+taskList.addEventListener("dragover", (e) => {
   e.preventDefault(); // Necessary to allow a drop
-  const draggingItem = document.querySelector('.dragging');
-  const siblings = [...taskList.querySelectorAll('li:not(.dragging)')];
+  const draggingItem = document.querySelector(".dragging");
+  const siblings = [...taskList.querySelectorAll("li:not(.dragging)")];
 
   // Find the sibling that the dragging item should be placed before
-  let nextSibling = siblings.find(sibling => {
+  let nextSibling = siblings.find((sibling) => {
     return e.clientY <= sibling.offsetTop + sibling.offsetHeight / 2;
   });
 
   taskList.insertBefore(draggingItem, nextSibling);
+  saveToLocalStorage();
 });
 
 clearCompleted.addEventListener("click", () => {
-  document.querySelectorAll(".checkbox.checked").forEach(box => box.closest("li").remove())
+  document
+    .querySelectorAll(".checkbox.checked")
+    .forEach((box) => box.closest("li").remove());
   updateItemsLeft();
-})
+  saveToLocalStorage();
+});
 
 const filterOptionsBtns = document.querySelectorAll(".filter-options button");
 
-filterOptionsBtns.forEach(button => {
-button.addEventListener("click", (e) => {
-    filterOptionsBtns.forEach(btn => btn.classList.remove("selected"));
+filterOptionsBtns.forEach((button) => {
+  button.addEventListener("click", (e) => {
+    filterOptionsBtns.forEach((btn) => btn.classList.remove("selected"));
     e.target.classList.add("selected");
 
     const filter = e.target.innerText;
     const allTasks = taskList.querySelectorAll("li.box");
 
-    allTasks.forEach(task => {
-      const isCompleted = task.querySelector(".checkbox").classList.contains("checked");
+    allTasks.forEach((task) => {
+      const isCompleted = task
+        .querySelector(".checkbox")
+        .classList.contains("checked");
 
       switch (filter) {
-        case 'All':
+        case "All":
           task.style.display = "flex";
           break;
-        case 'Active':
+        case "Active":
           task.style.display = isCompleted ? "none" : "flex";
           break;
-        case 'Completed':
+        case "Completed":
           task.style.display = isCompleted ? "flex" : "none";
           break;
       }
     });
   });
-})
+});
+
+loadFromLocalStorage();
