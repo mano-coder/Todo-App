@@ -13,6 +13,20 @@ if (savedTheme === "dark") {
   document.getElementById("icon-moon").classList.add("hidden");
 }
 
+let lastDeletedTask = null;
+let toastTimeout = null;
+
+// Create the toast element and add it to the body
+document.body.insertAdjacentHTML('beforeend', `
+  <div id="toast-container">
+    <span>Task deleted</span>
+    <button id="undo-btn">Undo</button>
+  </div>
+`);
+
+const toast = document.getElementById("toast-container");
+const undoBtn = document.getElementById("undo-btn");
+
 const updateItemsLeft = () => {
   const activeTasks = taskList.querySelectorAll(
     ".checkbox:not(.checked)",
@@ -125,30 +139,62 @@ form.addEventListener("submit", (e) => {
 });
 
 taskList.addEventListener("click", (e) => {
-  const button = e.target.closest("button");
   const checkBox = e.target.closest(".checkbox");
+  const button = e.target.closest("button");
   const li = e.target.closest("li");
 
   if (button && li) {
-    // 1. Add the animation class
+    // SAVE the data before deleting
+    lastDeletedTask = {
+      text: li.querySelector("span:not(.checkbox)").innerText,
+      completed: li.querySelector(".checkbox").classList.contains("checked")
+    };
+
     li.classList.add("fall-out");
-
-    // 2. Wait for the CSS transition (0.4s) to finish before removing
-    li.addEventListener(
-      "transitionend",
-      () => {
-        li.remove();
-        updateItemsLeft();
-        saveToLocalStorage();
-      },
-      { once: true },
-    ); // Ensure this only runs once
-  }
-
+    li.addEventListener("transitionend", () => {
+      li.remove();
+      updateItemsLeft();
+      saveToLocalStorage();
+      showToast(); // Trigger the toast
+    }, { once: true });
+  } 
   if (checkBox) {
     checkBox.classList.toggle("checked");
     updateItemsLeft();
     saveToLocalStorage();
+  }
+});
+
+// Function to show toast
+const showToast = () => {
+  clearTimeout(toastTimeout);
+  toast.classList.add("show");
+
+  // Automatically hide after 5 seconds
+  toastTimeout = setTimeout(() => {
+    toast.classList.remove("show");
+  }, 5000);
+};
+
+// UNDO Logic
+undoBtn.addEventListener("click", () => {
+  if (lastDeletedTask) {
+    // Re-create the task
+    const undoHTML = `
+      <li class="box" draggable="true">
+        <span class="checkbox ${lastDeletedTask.completed ? "checked" : ""}"><input type="checkbox" /></span>
+        <span>${lastDeletedTask.text}</span>
+        <button class="hidden-btn"><img src="./images/icon-cross.svg" /></button>
+      </li>
+    `;
+    
+    taskList.insertAdjacentHTML('beforeend', undoHTML);
+    updateItemsLeft();
+    saveToLocalStorage();
+    
+    // Hide toast immediately
+    toast.classList.remove("show");
+    lastDeletedTask = null;
   }
 });
 
